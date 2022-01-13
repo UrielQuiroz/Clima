@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 import Header from "./components/Header";
 import Formulario from "./components/Formulario";
+import Clima from "./components/Clima";
+import Error from "./components/Error";
 
 function App() {
 
@@ -11,6 +13,10 @@ function App() {
     });
 
     const [ consulta, setConsulta ] = useState(false);
+
+    const [ resultado, setResultado ] = useState({});
+
+    const [ error, setError ] = useState(false);
 
     const { ciudad, pais } = busqueda;
 
@@ -23,13 +29,31 @@ function App() {
   
             const rpta = await fetch(url);
             const result = await rpta.json();
-            console.log(result);
+            setResultado(result);
+            setConsulta(false)
+
+            if (result.cod === "404") {
+              setError(true);
+            } else {
+              setError(false);
+            }
           }
 
         }
 
         consultarApi();
     }, [consulta]);
+
+  
+
+    let componente;
+    if(error) {
+      componente = <Error mensaje='No Hay Resultados' />
+    } else {
+      componente = <Clima resultado={resultado}/>
+    }
+
+
 
   return (
     <Fragment>
@@ -48,7 +72,7 @@ function App() {
               </div>
 
               <div className='col m6 s12'>
-                2
+                {componente}
               </div>
 
             </div>
